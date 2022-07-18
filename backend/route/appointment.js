@@ -35,15 +35,15 @@ router.post("/", async (req, res) => {
   if (startTime < now) return res.status(400).send("Start time is already past");
 
   const endTime = new Date(startTime.getTime() + 30 * 60 * 1000);
-  const date = startTime.toISOString().split("T")[0];
+  const date = startTime.toISOString().split("T")[0]; // for the DB only
 
   // lets find a colliding appointment
   const appointmentsToday = await Appointment.find({ date: date });
   for (const app of appointmentsToday) {
     if (startTime >= app.startTime && startTime < app.endTime) {
-      return res.status(400).send("This time is already booked");
+      return res.status(400).send("This (start)time is already booked");
     } else if (endTime > app.startTime && endTime <= app.endTime) {
-      return res.status(400).send("This time is already booked");
+      return res.status(400).send("This (end)time is already booked");
     }
   }
 

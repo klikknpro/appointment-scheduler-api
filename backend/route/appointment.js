@@ -23,7 +23,7 @@ router.get("/:id", async (req, res) => {
   const appointment = await Appointment.findById(id);
   if (!appointment) return res.status(404).send("Appointment not found");
 
-  res.status(200).json(appointment);
+  res.status(200).json({ appointment });
 });
 
 router.post("/", async (req, res) => {
@@ -56,7 +56,7 @@ router.post("/", async (req, res) => {
   newAppointment
     .save()
     .then((data) => {
-      return res.status(200).json({ data });
+      return res.status(201).json({ data });
     })
     .catch((err) => {
       return res.status(500).json(err);
@@ -102,11 +102,16 @@ router.patch("/:id", async (req, res) => {
   );
   if (!modifiedAppointment) return res.status(500).send("Database error");
 
-  res.status(200).json({ modifiedAppointment });
+  res.status(201).json({ modifiedAppointment });
 });
 
 router.delete("/:id", async (req, res) => {
-  // delete appointment
+  if (!req.params.id) res.status(400).send("Appointment id is missing");
+  const { id } = req.params;
+
+  Appointment.findOneAndDelete({ _id: id })
+    .then((deletedAppointment) => res.status(200).json({ deletedAppointment }))
+    .catch((err) => res.status(404).send("Appointment not found"));
 });
 
 module.exports = router;
